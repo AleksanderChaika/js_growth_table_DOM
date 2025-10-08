@@ -1,55 +1,30 @@
 'use strict';
 
 const table = document.querySelector('.field');
+const tbody = table.querySelector('tbody');
 const appendRow = document.querySelector('.append-row');
 const removeRow = document.querySelector('.remove-row');
 const appendColumn = document.querySelector('.append-column');
 const removeColumn = document.querySelector('.remove-column');
-const tbody = table.querySelector('tbody');
 
-let rowsCount = table.rows.length;
-let colsCount = table.rows[0].cells.length;
+let rowsCount = tbody ? tbody.rows.length : 0;
+let colsCount = tbody && tbody.rows[0] ? tbody.rows[0].cells.length : 0;
 
 function updateButtons() {
-  if (rowsCount === 10) {
-    appendRow.disabled = true;
-  }
-
-  if (rowsCount < 10) {
-    appendRow.disabled = false;
-  }
-
-  if (rowsCount === 2) {
-    removeRow.disabled = true;
-  }
-
-  if (rowsCount > 2) {
-    removeRow.disabled = false;
-  }
-
-  if (colsCount === 10) {
-    appendColumn.disabled = true;
-  }
-
-  if (colsCount < 10) {
-    appendColumn.disabled = false;
-  }
-
-  if (colsCount === 2) {
-    removeColumn.disabled = true;
-  }
-
-  if (colsCount > 2) {
-    removeColumn.disabled = false;
-  }
+  appendRow.disabled = rowsCount >= 10;
+  removeRow.disabled = rowsCount <= 2;
+  appendColumn.disabled = colsCount >= 10;
+  removeColumn.disabled = colsCount <= 2;
 }
 
 appendRow.addEventListener('click', () => {
-  if (rowsCount < 10) {
+  if (rowsCount < 10 && tbody) {
     const tr = document.createElement('tr');
 
     for (let i = 0; i < colsCount; i++) {
-      tr.appendChild(document.createElement('td'));
+      const td = document.createElement('td');
+
+      tr.appendChild(td);
     }
 
     tbody.appendChild(tr);
@@ -59,7 +34,7 @@ appendRow.addEventListener('click', () => {
 });
 
 removeRow.addEventListener('click', () => {
-  if (rowsCount > 2) {
+  if (rowsCount > 2 && tbody) {
     tbody.lastElementChild.remove();
     rowsCount--;
     updateButtons();
@@ -67,13 +42,11 @@ removeRow.addEventListener('click', () => {
 });
 
 appendColumn.addEventListener('click', () => {
-  if (colsCount < 10) {
-    const rows = table.rows;
-
-    for (let i = 0; i < rows.length; i++) {
+  if (colsCount < 10 && tbody) {
+    for (let i = 0; i < tbody.rows.length; i++) {
       const td = document.createElement('td');
 
-      rows[i].appendChild(td);
+      tbody.rows[i].appendChild(td);
     }
 
     colsCount++;
@@ -82,13 +55,9 @@ appendColumn.addEventListener('click', () => {
 });
 
 removeColumn.addEventListener('click', () => {
-  if (colsCount > 2) {
-    const rows = table.rows;
-
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-
-      row.lastElementChild.remove();
+  if (colsCount > 2 && tbody) {
+    for (let i = 0; i < tbody.rows.length; i++) {
+      tbody.rows[i].lastElementChild.remove();
     }
 
     colsCount--;
