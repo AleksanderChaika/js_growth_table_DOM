@@ -2,13 +2,16 @@
 
 const table = document.querySelector('.field');
 const tbody = table.querySelector('tbody');
+const thead = table.querySelector('thead');
 const appendRow = document.querySelector('.append-row');
 const removeRow = document.querySelector('.remove-row');
 const appendColumn = document.querySelector('.append-column');
 const removeColumn = document.querySelector('.remove-column');
 
+// Начальные размеры
 let rowsCount = tbody ? tbody.rows.length : 0;
-let colsCount = tbody && tbody.rows[0] ? tbody.rows[0].cells.length : 0;
+let colsCount =
+  thead?.querySelector('tr')?.cells.length || tbody?.rows[0]?.cells.length || 0;
 
 function updateButtons() {
   appendRow.disabled = rowsCount >= 10;
@@ -22,11 +25,8 @@ appendRow.addEventListener('click', () => {
     const tr = document.createElement('tr');
 
     for (let i = 0; i < colsCount; i++) {
-      const td = document.createElement('td');
-
-      tr.appendChild(td);
+      tr.appendChild(document.createElement('td'));
     }
-
     tbody.appendChild(tr);
     rowsCount++;
     updateButtons();
@@ -42,11 +42,23 @@ removeRow.addEventListener('click', () => {
 });
 
 appendColumn.addEventListener('click', () => {
-  if (colsCount < 10 && tbody) {
-    for (let i = 0; i < tbody.rows.length; i++) {
-      const td = document.createElement('td');
+  if (colsCount < 10) {
+    if (thead) {
+      for (let i = 0; i < thead.rows.length; i++) {
+        const cellType = thead.rows[i].cells[0]?.tagName || 'TH';
+        const newCell = document.createElement(cellType.toLowerCase());
 
-      tbody.rows[i].appendChild(td);
+        thead.rows[i].appendChild(newCell);
+      }
+    }
+
+    if (tbody) {
+      for (let i = 0; i < tbody.rows.length; i++) {
+        const cellType = tbody.rows[i].cells[0]?.tagName || 'TD';
+        const newCell = document.createElement(cellType.toLowerCase());
+
+        tbody.rows[i].appendChild(newCell);
+      }
     }
 
     colsCount++;
@@ -55,9 +67,17 @@ appendColumn.addEventListener('click', () => {
 });
 
 removeColumn.addEventListener('click', () => {
-  if (colsCount > 2 && tbody) {
-    for (let i = 0; i < tbody.rows.length; i++) {
-      tbody.rows[i].lastElementChild.remove();
+  if (colsCount > 2) {
+    if (thead) {
+      for (let i = 0; i < thead.rows.length; i++) {
+        thead.rows[i].lastElementChild.remove();
+      }
+    }
+
+    if (tbody) {
+      for (let i = 0; i < tbody.rows.length; i++) {
+        tbody.rows[i].lastElementChild.remove();
+      }
     }
 
     colsCount--;
